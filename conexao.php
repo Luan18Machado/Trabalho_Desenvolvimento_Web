@@ -1,4 +1,5 @@
 
+
 <?php
 
 $servidor = "localhost";
@@ -6,7 +7,6 @@ $banco = "flappy_bird";
 $usuario = "root";
 $senha = "";
 
-require_once "conexao.php";
 try {
 
     $pdo = new PDO(
@@ -15,15 +15,16 @@ try {
         $senha
     );
 
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-   
+    $pdo->setAttribute(
+        PDO::ATTR_ERRMODE,
+        PDO::ERRMODE_EXCEPTION
+    );
 
 } catch (PDOException $erro) {
 
-    echo "Erro na conexão: " . $erro->getMessage();
+    http_response_code(500);
+    exit("Erro na conexão com o banco de dados.");
 
 }
 
-?>
 

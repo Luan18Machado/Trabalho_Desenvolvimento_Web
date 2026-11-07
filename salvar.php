@@ -1,53 +1,61 @@
 
 
+
 <?php
 
-    // Configura o PDO para apresentar exceções em caso de erro
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+header("Content-Type: text/plain; charset=utf-8");
 
-    // Verifica se os dados vieram do formulário
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+// Importa a conexão com o banco
+require_once __DIR__ . "/conexao.php";
 
-        // Recebe os dados
-        $nome = trim($_POST['jogador'] ?? '');
-        $pontos = $_POST['pontos'] ?? '';
+// Verifica o método de envio
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    http_response_code(405);
+    exit("Método não permitido.");
+}
 
-        // Verifica se os campos estão preenchidos
-        if ($nome === '' || $pontos === '') {
-            die("Erro: preencha todos os campos!");
-        }
+try {
 
-        // Valida a pontuação
-        $pontos = filter_var($pontos, FILTER_VALIDATE_INT);
+    // Recebe os dados
+    $nome = trim($_POST["jogador"] ?? "");
+    $pontos = filter_var(
+        $_POST["pontos"] ?? null,
+        FILTER_VALIDATE_INT
+    );
 
-        if ($pontos === false || $pontos < 0) {
-            die("Erro: pontuação inválida!");
-        }
-
-        // Prepara o comando SQL
-        $sql = "INSERT INTO pontuacoes (jogador, pontos)
-                VALUES (:jogador, :pontos)";
-
-        $stmt = $pdo->prepare($sql);
-
-        // Executa o cadastro
-        $stmt->execute([
-            ":jogador" => $nome,
-            ":pontos" => $pontos
-        ]);
-
-        // Mensagem de sucesso
-        echo "Pontuação salva com sucesso!";
-
-    } else {
-
-        echo "Acesse esta página através do formulário.";
-
+    // Valida o nome
+    if ($nome === "") {
+        http_response_code(400);
+        exit("Digite o nome do jogador.");
     }
 
-} catch (PDOException $e) {
+    // Valida a pontuação
+    if ($pontos === false || $pontos === null || $pontos < 0) {
+        http_response_code(400);
+        exit("Pontuação inválida.");
+    }
 
-    echo "Erro ao acessar o banco de dados: " . $e->getMessage();
+    // Prepara o cadastro
+    $sql = "INSERT INTO pontuacoes (jogador, pontos)
+            VALUES (:jogador, :pontos)";
+
+    $stmt = $pdo->prepare($sql);
+
+    // Salva no MySQL
+    $stmt->execute([
+        ":jogador" => $nome,
+        ":pontos" => $pontos
+    ]);
+
+    echo "Pontuação salva com sucesso!";
+
+} catch (PDOException $erro) {
+
+    error_log($erro->getMessage());
+
+    http_response_code(500);
+    echo "Erro ao salvar pontuação no banco de dados.";
 
 }
+
 

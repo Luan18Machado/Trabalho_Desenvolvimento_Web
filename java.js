@@ -186,18 +186,19 @@ function jogar(t) {
 
 // REINICIAR
 function reiniciar() {
-    if (animacao !== null) cancelAnimationFrame(animacao);
-    pontuacaoSalva = false;
 
-    livros.forEach(livro => {
-        livro.cima.remove();
-        livro.baixo.remove();
+    if (animacao !== null) {
+        cancelAnimationFrame(animacao);
+    }
 
     pontuacaoSalva = false;
     salvandoPontuacao = false;
 
     document.getElementById("salvarPontuacao").hidden = true;
 
+    livros.forEach(livro => {
+        livro.cima.remove();
+        livro.baixo.remove();
     });
 
     livros = [];

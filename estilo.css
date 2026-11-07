@@ -95,3 +95,30 @@ button {
     h1 { font-size: 25px; }
     h3 { font-size: 19px; }
 }
+
+/* Cadastro do jogador */
+#cadastro {
+    margin: 15px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    color: white;
+}
+
+#nomeJogador {
+    padding: 10px;
+    border: 2px solid white;
+    border-radius: 6px;
+    font-size: 16px;
+    width: 220px;
+}
+
+#salvarPontuacao {
+    background-color: #28a745;
+    color: white;
+}
+
+#salvarPontuacao:hover {
+    background-color: #218838;
+}
