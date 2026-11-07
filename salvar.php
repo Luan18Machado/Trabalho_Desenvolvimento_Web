@@ -1,21 +1,62 @@
 
+
 <?php
 
-require "conexao.php";
+try {
 
-$nome = $_POST["jogador"];
-$pontos = (int) $_POST["pontos"];
+    // Conexão com o banco de dados
+    $pdo = new PDO(
+        "mysql:host=localhost;dbname=flappy_bird;charset=utf8mb4",
+        "root",
+        ""
+    );
 
-$sql = "INSERT INTO pontuacoes (jogador, pontos)
-        VALUES (:jogador, :pontos)";
+    // Configura o PDO para apresentar exceções em caso de erro
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-$stmt = $pdo->prepare($sql);
+    // Verifica se os dados vieram do formulário
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-$stmt->execute([
-    ":jogador" => $nome,
-    ":pontos" => $pontos
-]);
+        // Recebe os dados
+        $nome = trim($_POST['jogador'] ?? '');
+        $pontos = $_POST['pontos'] ?? '';
 
-echo "Pontuação salva!";
+        // Verifica se os campos estão preenchidos
+        if ($nome === '' || $pontos === '') {
+            die("Erro: preencha todos os campos!");
+        }
 
-?>
+        // Valida a pontuação
+        $pontos = filter_var($pontos, FILTER_VALIDATE_INT);
+
+        if ($pontos === false || $pontos < 0) {
+            die("Erro: pontuação inválida!");
+        }
+
+        // Prepara o comando SQL
+        $sql = "INSERT INTO pontuacoes (jogador, pontos)
+                VALUES (:jogador, :pontos)";
+
+        $stmt = $pdo->prepare($sql);
+
+        // Executa o cadastro
+        $stmt->execute([
+            ":jogador" => $nome,
+            ":pontos" => $pontos
+        ]);
+
+        // Mensagem de sucesso
+        echo "Pontuação salva com sucesso!";
+
+    } else {
+
+        echo "Acesse esta página através do formulário.";
+
+    }
+
+} catch (PDOException $e) {
+
+    echo "Erro ao acessar o banco de dados: " . $e->getMessage();
+
+}
+

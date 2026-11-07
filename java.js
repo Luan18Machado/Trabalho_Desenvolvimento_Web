@@ -117,9 +117,19 @@ function colidiu(livro) {
 }
 
 // FIM DE JOGO
+
 function terminar() {
+
+    if (!ativo) return;
+
     ativo = false;
+
     fim.style.display = "block";
+
+    if (!pontuacaoSalva) {
+        pontuacaoSalva = true;
+        salvarPontuacao();
+    }
 }
 
 // JOGO
@@ -178,10 +188,12 @@ function jogar(t) {
 // REINICIAR
 function reiniciar() {
     if (animacao !== null) cancelAnimationFrame(animacao);
+    pontuacaoSalva = false;
 
     livros.forEach(livro => {
         livro.cima.remove();
         livro.baixo.remove();
+
     });
 
     livros = [];
@@ -213,3 +225,44 @@ document.getElementById("reiniciar").addEventListener("click", reiniciar);
 
 ajustarTela();
 animacao = requestAnimationFrame(jogar);
+
+
+async function salvarPontuacao() {
+
+    // Recupera o nome digitado pelo jogador
+    const nome = document.getElementById("nomeJogador").value.trim();
+
+    // Verifica se o nome foi preenchido
+    if (nome === "") {
+        alert("Digite seu nome para salvar a pontuação!");
+        return;
+    }
+
+    // Prepara os dados para enviar ao PHP
+    const dados = new FormData();
+
+    dados.append("jogador", nome);
+    dados.append("pontos", pontos);
+
+    try {
+
+        // Envia os dados para salvar.php
+        const resposta = await fetch("salvar.php", {
+            method: "POST",
+            body: dados
+        });
+
+        // Recebe a resposta do PHP
+        const resultado = await resposta.text();
+
+        console.log(resultado);
+
+        alert(resultado);
+
+    } catch (erro) {
+
+        console.error("Erro ao salvar pontuação:", erro);
+        alert("Não foi possível salvar a pontuação.");
+
+    }
+}
