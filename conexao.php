@@ -16,7 +16,7 @@ try {
 
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    echo "Conexão com MySQL realizada com sucesso!";
+     "Conexão com MySQL realizada com sucesso!";
 
 } catch (PDOException $erro) {
 

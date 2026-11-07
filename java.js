@@ -27,6 +27,7 @@ let ativo = true;
 let livros = [];
 let tempo = 0;
 let animacao = null;
+let pontuacaoSalva = false;
 
 // AJUSTAR TELA
 function ajustarTela() {
