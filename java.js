@@ -28,6 +28,7 @@ let livros = [];
 let tempo = 0;
 let animacao = null;
 let pontuacaoSalva = false;
+let salvandoPontuacao = false;
 
 // AJUSTAR TELA
 function ajustarTela() {
@@ -127,10 +128,7 @@ function terminar() {
 
     fim.style.display = "block";
 
-    if (!pontuacaoSalva) {
-        pontuacaoSalva = true;
-        salvarPontuacao();
-    }
+    salvarPontuacao();
 }
 
 // JOGO
@@ -195,6 +193,11 @@ function reiniciar() {
         livro.cima.remove();
         livro.baixo.remove();
 
+    pontuacaoSalva = false;
+    salvandoPontuacao = false;
+
+    document.getElementById("salvarPontuacao").hidden = true;
+
     });
 
     livros = [];
@@ -230,16 +233,35 @@ animacao = requestAnimationFrame(jogar);
 
 async function salvarPontuacao() {
 
-    // Recupera o nome digitado pelo jogador
-    const nome = document.getElementById("nomeJogador").value.trim();
-
-    // Verifica se o nome foi preenchido
-    if (nome === "") {
-        alert("Digite seu nome para salvar a pontuação!");
+    // Impede salvamentos duplicados
+    if (pontuacaoSalva || salvandoPontuacao) {
         return;
     }
 
-    // Prepara os dados para enviar ao PHP
+    const campoNome = document.getElementById("nomeJogador");
+
+    const botaoSalvar = document.getElementById("salvarPontuacao");
+
+    const nome = campoNome.value.trim();
+
+    // Verifica se o nome foi preenchido
+    if (nome === "") {
+
+        alert("Digite seu nome para salvar a pontuação!");
+
+        botaoSalvar.hidden = false;
+
+        campoNome.focus();
+
+        return;
+    }
+
+    // Inicia o processo de salvamento
+    salvandoPontuacao = true;
+
+    botaoSalvar.hidden = false;
+    botaoSalvar.disabled = true;
+
     const dados = new FormData();
 
     dados.append("jogador", nome);
@@ -247,23 +269,41 @@ async function salvarPontuacao() {
 
     try {
 
-        // Envia os dados para salvar.php
         const resposta = await fetch("salvar.php", {
             method: "POST",
             body: dados
         });
 
-        // Recebe a resposta do PHP
         const resultado = await resposta.text();
 
-        console.log(resultado);
+        // Verifica se o PHP confirmou o cadastro
+        if (!resposta.ok ||
+            resultado.trim() !== "Pontuação salva com sucesso!") {
+
+            throw new Error(resultado);
+        }
+
+        // Só marca como salva após confirmação
+        pontuacaoSalva = true;
+
+        botaoSalvar.hidden = true;
 
         alert(resultado);
 
     } catch (erro) {
 
-        console.error("Erro ao salvar pontuação:", erro);
-        alert("Não foi possível salvar a pontuação.");
+        console.error("Erro ao salvar:", erro);
+
+        alert("Erro ao salvar pontuação. Tente novamente.");
+
+    } finally {
+
+        salvandoPontuacao = false;
+
+        botaoSalvar.disabled = false;
 
     }
 }
+
+document.getElementById("salvarPontuacao")
+    .addEventListener("click", salvarPontuacao);

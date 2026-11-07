@@ -2,15 +2,6 @@
 
 <?php
 
-try {
-
-    // Conexão com o banco de dados
-    $pdo = new PDO(
-        "mysql:host=localhost;dbname=flappy_bird;charset=utf8mb4",
-        "root",
-        ""
-    );
-
     // Configura o PDO para apresentar exceções em caso de erro
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 

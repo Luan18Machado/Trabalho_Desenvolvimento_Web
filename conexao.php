@@ -6,6 +6,7 @@ $banco = "flappy_bird";
 $usuario = "root";
 $senha = "";
 
+require_once "conexao.php";
 try {
 
     $pdo = new PDO(
@@ -16,7 +17,7 @@ try {
 
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-     "Conexão com MySQL realizada com sucesso!";
+   
 
 } catch (PDOException $erro) {
 
